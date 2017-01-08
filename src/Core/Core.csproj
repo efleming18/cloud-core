@@ -72,7 +72,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Azure\AzureQueues.cs" />
+    <Compile Include="Azure\Interfaces\IQueueResolver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Azure\QueueResolver.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
