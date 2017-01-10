@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Core.Azure;
 using Core.Azure.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.JsonPatch.Operations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -21,6 +19,7 @@ namespace GroceryWeb
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
                 .AddEnvironmentVariables();
             Configuration = builder.Build();
+            
         }
 
         public IConfigurationRoot Configuration { get; }
@@ -30,7 +29,9 @@ namespace GroceryWeb
         {
             // Add framework services.
             services.AddMvc();
-            services.AddSingleton<IQueueResolver>();
+            
+            services.Configure<AzureStorageSettings>(Configuration.GetSection("Data:Storage"));
+            services.AddTransient<IQueueResolver, QueueResolver>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
