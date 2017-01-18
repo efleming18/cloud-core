@@ -1,7 +1,6 @@
 ﻿using Core.Azure;
 using Core.Azure.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using Microsoft.WindowsAzure.Storage.Queue;
 
 namespace GroceryWeb.Controllers
@@ -9,13 +8,17 @@ namespace GroceryWeb.Controllers
     public class HomeController : Controller
     {
         private readonly IQueueResolver _queueResolver;
-        public HomeController(IOptions<AzureStorageSettings> settings, IQueueResolver queueResolver)
+        public HomeController(IQueueResolver queueResolver)
         {
             _queueResolver = queueResolver;
-            var what = settings.Value.AzureConnectionString;
         }
 
         public IActionResult Index()
+        {
+            return View();
+        }
+
+        public IActionResult AddMessage()
         {
             var testQueue = _queueResolver.GetQueue(AzureQueues.FirstTestQueueName);
             testQueue.AddMessage(new CloudQueueMessage("message"));
