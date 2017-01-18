@@ -2,7 +2,6 @@
 using Core.Azure.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.JsonPatch.Operations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -29,8 +28,11 @@ namespace GroceryWeb
         {
             // Add framework services.
             services.AddMvc();
-            
+            services.AddOptions();
+
             services.Configure<AzureStorageSettings>(Configuration.GetSection("Data:Storage"));
+            BootstrapAzureQueues.CreateKnownAzureQueues(Configuration["Data:Storage:AzureConnectionString"]);
+
             services.AddTransient<IQueueResolver, QueueResolver>();
         }
 

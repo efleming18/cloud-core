@@ -1,4 +1,5 @@
 ﻿using Core.Azure.Interfaces;
+using Microsoft.Extensions.Options;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Queue;
 
@@ -9,7 +10,7 @@ namespace Core.Azure
         private readonly CloudQueueClient _queueClient;
         public QueueResolver(IOptions<AzureStorageSettings> settings)
         {
-            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(settings.AzureConnectionString);
+            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(settings.Value.AzureConnectionString);
             _queueClient = storageAccount.CreateCloudQueueClient();
         }
 
