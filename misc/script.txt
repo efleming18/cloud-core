@@ -1,0 +1,19 @@
+How to Create and Push a message to an Azure Storage Queue
+Intro video
+
+It is common to want to be able to use messages, or message queues in your system’s architecture. I’m actively using a queueing system in my day-to-day work, called NServiceBus, which uses the local computer for it’s transport whether that be MSMQ, SQL Transport, or others that NServiceBus supports. I’ve recently come across a scenario where a service outside of my control needed access to the queue. This is where Azure Queue Storage comes in to play.
+
+Azure Queue Storage can be accessed anywhere via authenticated http, or https requests. In these queues, you can store millions of messages to be consumed by some process that runs in your code base to read from the queue, an Azure web role, or an Azure worker role.
+
+Things you'll need:
+- Azure Storage Account
+(This will be the place where all of the Azure Storage Data objects are stored and be interacted with from the Azure Portal, Azure CLI, or Azure PowerShell )
+- From here you'll get your AccountName and AccountKey, which be used for configuring your Azure Connection String.
+
+Setting up a connection string to be used by your code, is a little different in .NET Core.
+
+First we create an AzureStorageSettings class
+(Show the class)
+
+ 
+

@@ -3,6 +3,6 @@
     public class AzureStorageSettings
     {
         public string AzureConnectionString { get; set; }
-        public bool UseDevelopmentStorage { get; set; }
+        public string UseDevelopmentStorage { get; set; }
     }
 }
