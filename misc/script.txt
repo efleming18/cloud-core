@@ -12,8 +12,24 @@ Things you'll need:
 
 Setting up a connection string to be used by your code, is a little different in .NET Core.
 
-First we create an AzureStorageSettings class
+First we create an AzureStorageSettings class with a single property, *ConnectionString*
 (Show the class)
 
- 
+Then we need to set the ConnectionString value to our appsettings.json file, so we can leverage it via the Options pattern.
+For this, I've created a "Data" section, with a subsection of "Azure"
+The provided value for the ConnectionString can either be for local development, or development with your actual Azure Account
 
+In this example, we are going to develop this locally, but if you wanted to interact with your actual Azure account your connection string would look something like this:
+
+"ConnectionString": "DefaultEndpointsProtocol=https;AccountName=your-azure-account-name;AccountKey=your-azure-account-key"
+For now we will set the ConnectionString to: "ConnectionString": "UseDevelopmentStorage=true"
+ 
+Now that we have our appsettings file set up, we need to read these values and use them elsewhere.
+
+In the Startup file  of our web proejct there is a *ConfigureServices* section. In order to inject our AzureStorageSettings to other classes we need to use the new Options pattern which uses custom options/settings classes to represent a group of related settings. 
+(Options pattern link: https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration#options-config-objects)
+
+First, we'll need to enable the use of the Options pattern with the following line:
+services.AddOptions();
+
+Now we can pull the values from the "Azure" subsection of our appsettings file to fill an AzureStorageSettings object 

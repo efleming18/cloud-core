@@ -30,8 +30,8 @@ namespace GroceryWeb
             services.AddMvc();
             services.AddOptions();
 
-            services.Configure<AzureStorageSettings>(Configuration.GetSection("Data:Storage"));
-            BootstrapAzureQueues.CreateKnownAzureQueues(Configuration["Data:Storage:AzureConnectionString"]);
+            services.Configure<AzureStorageSettings>(Configuration.GetSection("Data:Azure"));
+            BootstrapAzureQueues.CreateKnownAzureQueues(Configuration["Data:Azure:ConnectionString"]);
 
             services.AddTransient<IQueueResolver, QueueResolver>();
         }

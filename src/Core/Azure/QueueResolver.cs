@@ -10,7 +10,7 @@ namespace Core.Azure
         private readonly CloudQueueClient _queueClient;
         public QueueResolver(IOptions<AzureStorageSettings> settings)
         {
-            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(settings.Value.AzureConnectionString);
+            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(settings.Value.ConnectionString);
             _queueClient = storageAccount.CreateCloudQueueClient();
         }
 
