@@ -4,7 +4,7 @@ namespace Core.Azure
 {
     public static class AzureQueues
     {
-        public static string FirstTestQueueName = "first-test-queue";
-        public static List<string> KnownQueues = new List<string> { FirstTestQueueName };
+        public static string GroceryList = "grocery-list";
+        public static List<string> KnownQueues = new List<string> { GroceryList };
     }
 }

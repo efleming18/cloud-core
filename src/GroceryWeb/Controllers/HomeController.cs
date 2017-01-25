@@ -20,7 +20,7 @@ namespace GroceryWeb.Controllers
 
         public IActionResult AddMessage()
         {
-            var testQueue = _queueResolver.GetQueue(AzureQueues.FirstTestQueueName);
+            var testQueue = _queueResolver.GetQueue(AzureQueues.GroceryList);
             testQueue.AddMessage(new CloudQueueMessage("message"));
             return View();
         }

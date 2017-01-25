@@ -32,4 +32,16 @@ In the Startup file  of our web proejct there is a *ConfigureServices* section. 
 First, we'll need to enable the use of the Options pattern with the following line:
 services.AddOptions();
 
-Now we can pull the values from the "Azure" subsection of our appsettings file to fill an AzureStorageSettings object 
+We can now pull the values from the "Azure" subsection of our appsettings file to fill an AzureStorageSettings object to use elsewhere via the IOptions interface.
+services.Configure<AzureStorageSettings>(Configuration.GetSection("Data:Azure"));
+
+But, in order to interact with specific queues, we need to of course ensure the queues exist.
+One of the best ways I've found to do this, is to have a Bootstrapper that loops through all known Azure queues when the web application starts up:
+BootstrapAzureQueues.CreateKnownAzureQueues(Configuration["Data:Azure:ConnectionString"]);
+
+In order to do this, we connect to our Azure Storage Account, parsing the connection string from our Web's appsettings.json
+then, we create our CloudQueueClient, which is the basis for all our commands interacting with our Azure account.
+Finally, I get a queue reference for a known AzureQueue and call CreateIfNotExists which does exactly as the method says, if the queue exists it will move on, if it does not it will be created with the name provided.
+A detail worth noting is there are specific rules for azure storage queue names such as: alphanumeric characters, and the dash sign are accepted, all characters must be lowercase, etc,
+The complete list can be found here: https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/naming-queues-and-metadata
+
