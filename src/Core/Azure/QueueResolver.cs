@@ -1,5 +1,4 @@
-﻿using Core.Azure.Interfaces;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Queue;
 
@@ -18,5 +17,10 @@ namespace Core.Azure
         {
             return _queueClient.GetQueueReference(queueName);
         }
+    }
+
+    public interface IQueueResolver
+    {
+        CloudQueue GetQueue(string queueName);
     }
 }

@@ -42,6 +42,108 @@ BootstrapAzureQueues.CreateKnownAzureQueues(Configuration["Data:Azure:Connection
 In order to do this, we connect to our Azure Storage Account, parsing the connection string from our Web's appsettings.json
 then, we create our CloudQueueClient, which is the basis for all our commands interacting with our Azure account.
 Finally, I get a queue reference for a known AzureQueue and call CreateIfNotExists which does exactly as the method says, if the queue exists it will move on, if it does not it will be created with the name provided.
+
 A detail worth noting is there are specific rules for azure storage queue names such as: alphanumeric characters, and the dash sign are accepted, all characters must be lowercase, etc,
 The complete list can be found here: https://docs.microsoft.com/en-us/rest/api/storageservices/fileservices/naming-queues-and-metadata
 
+Over in our HomeController, we can now begin to push messages to the queue. You could do it by simply creating a queue reference in your controller's constructor and using it to interact with the queue, but that means for every instantiation of the controller, you would be making an unecessary request to get a reference to a queue you may not need.
+
+        private readonly CloudQueueClient _cloudQueueClient;
+        public HomeController(IOptions<AzureStorageSettings> settings)
+        {
+            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(settings.Value.ConnectionString);
+            _cloudQueueClient = storageAccount.CreateCloudQueueClient();
+        }
+
+        public IActionResult Index()
+        {
+            return View();
+        }
+
+        public IActionResult AddMessage(AzureMessage message)
+        {
+            var groceryListQueue = _cloudQueueClient.GetQueueReference(AzureQueues.GroceryList);
+            groceryListQueue.AddMessage(new CloudQueueMessage(message.AzureMessageText));
+            return View("Index");
+        }
+
+In order to refactor this process a bit, and remove the need to create the queue client in the constructor, I've created a QueueResolver, in my Core project. This QueueResolver will take in the name of the queue you want to interact with, and return to you a CloudQueue reference. I've included the interface in here for convenience as well.
+
+        using Microsoft.Extensions.Options;
+        using Microsoft.WindowsAzure.Storage;
+        using Microsoft.WindowsAzure.Storage.Queue;
+
+        namespace Core.Azure
+        {
+            public class QueueResolver : IQueueResolver
+            {
+                private readonly CloudQueueClient _queueClient;
+                public QueueResolver(IOptions<AzureStorageSettings> settings)
+                {
+                    CloudStorageAccount storageAccount = CloudStorageAccount.Parse(settings.Value.ConnectionString);
+                    _queueClient = storageAccount.CreateCloudQueueClient();
+                }
+
+                public CloudQueue GetQueue(string queueName)
+                {
+                    return _queueClient.GetQueueReference(queueName);
+                }
+            }
+
+            public interface IQueueResolver
+            {
+                CloudQueue GetQueue(string queueName);
+            }
+        }
+
+
+All we need to do is register this in our ConfigureServices section of the Startup class.
+
+        public void ConfigureServices(IServiceCollection services)
+        {
+            // Add framework services.
+            services.AddMvc();
+            services.AddOptions();
+
+            services.Configure<AzureStorageSettings>(Configuration.GetSection("Data:Azure"));
+            BootstrapAzureQueues.CreateKnownAzureQueues(Configuration["Data:Azure:ConnectionString"]);
+
+            services.AddTransient<IQueueResolver, QueueResolver>();
+        }
+
+Then inject it into our HomeController
+
+        private readonly IQueueResolver _queueResolver;
+        public HomeController(IQueueResolver queueResolver)
+        {
+            _queueResolver = queueResolver;
+        }
+
+        public IActionResult Index()
+        {
+            return View();
+        }
+
+        public IActionResult AddMessage(AzureMessage message)
+        {
+            var groceryListQueue = _queueResolver.GetQueue(AzureQueues.GroceryList);
+            groceryListQueue.AddMessage(new CloudQueueMessage(message.AzureMessageText));
+            return View();
+        }
+
+
+[code language="csharp" escaped="true"]
+  "frameworks": {
+     "net452": { }
+  }
+[/code]
+
+[code language="csharp" escaped="true"]
+namespace GroceryWeb.Models
+{
+    public class AzureMessage
+    {
+        public string AzureMessageText { get; set; }
+    }
+}
+[/code]

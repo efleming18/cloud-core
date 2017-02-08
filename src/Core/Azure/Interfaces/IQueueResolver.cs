@@ -2,8 +2,8 @@
 
 namespace Core.Azure.Interfaces
 {
-    public interface IQueueResolver
-    {
-        CloudQueue GetQueue(string queueName);
-    }
+    //public interface IQueueResolver
+    //{
+    //    CloudQueue GetQueue(string queueName);
+    //}
 }
