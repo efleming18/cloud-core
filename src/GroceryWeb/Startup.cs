@@ -1,5 +1,4 @@
 ﻿using Core.Azure;
-using Core.Azure.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
